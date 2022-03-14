@@ -1,0 +1,25 @@
+---
+- hosts: vpn
+  gather_facts: yes
+  become: true
+  become_user: "root"
+
+  roles:
+
+    - role: ansible-role-pritunl
+
+    - role: firewalld
+      firewalld_zone: public
+      firewalld_ports_open:
+        # Pritunl-web
+        - proto: tcp
+          port: 80
+        - proto: tcp
+          port: 443
+        # pritunl clients server port
+        - proto: udp
+          port: 14637
+        # new ssh port
+        - proto: tcp
+          port: 22
+...

@@ -1,0 +1,15 @@
+---
+- hosts: vpn
+  gather_facts: yes
+  become: true
+  become_user: "root"
+
+  roles:
+
+    - role: ansible-role-epel-basic-soft
+
+    - role: ansible-role-liquidprompt
+      vars:
+        liquidprompt_user: 'root'
+        become_user: "root"
+...

@@ -1,0 +1,56 @@
+---
+
+- name: Disable SELinux
+  ansible.posix.selinux:
+    state: disabled
+  when: disable_selinux | bool
+  ignore_errors: yes
+
+- name: Disable SELinux without reboot
+  become: true
+  command: setenforce 0
+  when: disable_selinux | bool
+  ignore_errors: yes
+
+- name: 1.Check if EPEL repo is already configured.
+  stat: path={{ epel_repofile_path }}
+  register: epel_repofile_result
+
+- name: 2.Install EPEL repo.
+  yum:
+    name: "{{ epel_repo_url }}"
+    state: present
+  register: result
+  when: not epel_repofile_result.stat.exists
+
+- name: 3.Import EPEL GPG key.
+  rpm_key:
+    key: "{{ epel_repo_gpg_key_url }}"
+    state: present
+  when: not epel_repofile_result.stat.exists
+
+- name: ensure a list of basic packages installed
+  yum:
+    name:
+      - "@development-tools"
+      - wget
+      - tmux
+      - htop
+      - unzip
+      - zip
+      - net-tools
+      - bind-utils
+      - yum-utils
+      - dnf
+      - iptables-services
+      - bridge-utils
+      - mc
+      - bash-completion
+      - kexec-tools
+      - sos
+      - vim
+      - psacct
+      - git
+      - httpd-tools
+      - java-1.8.0-openjdk-headless
+    state: latest
